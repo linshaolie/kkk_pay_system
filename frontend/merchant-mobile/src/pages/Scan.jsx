@@ -10,6 +10,7 @@ export default function Scan() {
   const navigate = useNavigate();
   const [scanning, setScanning] = useState(true);
   const [codeReader, setCodeReader] = useState(null);
+  const [videoStream, setVideoStream] = useState(null);
 
   useEffect(() => {
     const reader = new BrowserMultiFormatReader();
@@ -17,12 +18,26 @@ export default function Scan() {
 
     startScanning(reader);
 
+    // 组件卸载时清理资源
     return () => {
       if (reader) {
         reader.reset();
       }
+      // 停止视频流
+      stopVideoStream();
     };
   }, []);
+
+  // 停止视频流
+  const stopVideoStream = () => {
+    const video = document.getElementById('video');
+    if (video && video.srcObject) {
+      const stream = video.srcObject;
+      const tracks = stream.getTracks();
+      tracks.forEach(track => track.stop());
+      video.srcObject = null;
+    }
+  };
 
   const startScanning = async (reader) => {
     try {
@@ -44,7 +59,8 @@ export default function Scan() {
         if (result) {
           // 立即停止扫描，避免重复触发
           setScanning(false);
-          reader.reset(); // 立即释放摄像头资源
+          reader.reset(); // 释放 ZXing 资源
+          stopVideoStream(); // 停止视频流
           await handleScanResult(result.getText());
         }
       });
@@ -80,14 +96,19 @@ export default function Scan() {
   };
 
   const handleManualInput = () => {
+    // 先停止摄像头
     if (codeReader) {
       codeReader.reset();
     }
+    stopVideoStream(); // 停止视频流
+    setScanning(false);
     
     const productId = prompt('请输入商品ID：');
-    if (productId) {
-      handleScanResult(productId);
+    if (productId && productId.trim()) {
+      // 用户输入了有效的商品ID，提交订单
+      handleScanResult(productId.trim());
     } else {
+      // 用户取消或输入为空，重新启动扫描
       setScanning(true);
       if (codeReader) {
         startScanning(codeReader);
@@ -105,6 +126,7 @@ export default function Scan() {
               if (codeReader) {
                 codeReader.reset();
               }
+              stopVideoStream(); // 停止视频流
               navigate('/');
             }}
             className="p-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors"
