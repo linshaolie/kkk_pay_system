@@ -69,7 +69,7 @@ export const createOrder = async (req, res, io, blockchainService) => {
       } catch (error) {
         console.error(`❌ [DEMO] 订单 ${orderId} 自动完成失败:`, error);
       }
-    }, 5000); // 5秒
+    }, 15000); // 5秒
 
     // 开始轮询订单支付状态（作为事件监听的备份方案）
     // 注意：DEMO 模式下也保留轮询，以便测试轮询功能

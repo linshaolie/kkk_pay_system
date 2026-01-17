@@ -1,10 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
-import { createServer as createHttpsServer } from 'https';
-import { readFileSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
 import { Server } from 'socket.io';
 import config from './config/index.js';
 import { initializeData } from './config/database.js';
@@ -14,29 +10,11 @@ import productRoutes from './routes/products.js';
 import orderRoutes from './routes/orders.js';
 import BlockchainService from './services/blockchainService.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
 const app = express();
 
-// 根据配置决定使用 HTTP 还是 HTTPS
-let httpServer;
-if (config.useHttps) {
-  try {
-    const options = {
-      key: readFileSync(join(__dirname, '../../certs/localhost+3-key.pem')),
-      cert: readFileSync(join(__dirname, '../../certs/localhost+3.pem'))
-    };
-    httpServer = createHttpsServer(options, app);
-    console.log('✓ HTTPS enabled');
-  } catch (error) {
-    console.warn('⚠ HTTPS certificates not found, falling back to HTTP');
-    console.warn('Run "mkcert localhost 127.0.0.1 YOUR_IP ::1" in certs/ directory');
-    httpServer = createServer(app);
-  }
-} else {
-  httpServer = createServer(app);
-}
+// 创建 HTTP 服务器
+const httpServer = createServer(app);
+
 const io = new Server(httpServer, {
   cors: {
     origin: true, // 开发环境允许所有来源
@@ -99,13 +77,12 @@ await initializeData();
 
 // 启动服务器
 const PORT = config.port;
-const protocol = config.useHttps ? 'https' : 'http';
 httpServer.listen(PORT, '0.0.0.0', () => {
   console.log(`
 ╔═══════════════════════════════════════╗
 ║   KKK POS Backend Server Started     ║
 ╠═══════════════════════════════════════╣
-║  Protocol: ${protocol.toUpperCase()}                    
+║  Protocol: HTTP                       
 ║  Port: ${PORT}                        
 ║  Environment: ${config.env}           
 ║  Storage: JSON Files                  

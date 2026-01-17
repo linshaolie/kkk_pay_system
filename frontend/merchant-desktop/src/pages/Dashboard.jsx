@@ -160,7 +160,6 @@ export default function Dashboard() {
     }
   };
 
-  console.log('currentOrder.paymentUrl: ', currentOrder.paymentUrl);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -266,6 +265,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </div>
+
 
                 {/* 二维码 */}
                 <div className="flex flex-col items-center mb-6">
