@@ -16,10 +16,14 @@ export const MONAD_CHAIN = defineChain({
     name: 'Monad',
     symbol: 'MON',
   },
-  rpcUrls: {
-    default: { http: [import.meta.env.VITE_MONAD_RPC_URL || 'https://testnet-rpc.monad.xyz'] },
-    public: { http: [import.meta.env.VITE_MONAD_RPC_URL || 'https://testnet-rpc.monad.xyz'] },
-  },
+  // 如果设置了环境变量，使用指定的 RPC
+  // 否则不设置 rpcUrls，让钱包使用它自己配置的 RPC
+  // ...(import.meta.env.VITE_MONAD_RPC_URL ? {
+  //   rpcUrls: {
+  //     default: { http: [import.meta.env.VITE_MONAD_RPC_URL] },
+  //     public: { http: [import.meta.env.VITE_MONAD_RPC_URL] },
+  //   }
+  // } : {}),
   blockExplorers: {
     default: { name: 'MonadScan', url: 'https://testnet.monad.xyz' },
   },

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAccount, useConnect, useDisconnect, useSwitchChain } from 'wagmi';
+import { useAccount, useConnect, useDisconnect, useSwitchChain, useChainId } from 'wagmi';
 import { ethers } from 'ethers';
 import api from '../utils/api';
 import { API_ENDPOINTS } from '../config';
@@ -16,6 +16,7 @@ export default function Payment() {
   const { connect, connectors, isPending: isConnecting } = useConnect();
   const { disconnect } = useDisconnect();
   const { switchChain } = useSwitchChain();
+  const chainId = useChainId();
 
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -48,6 +49,68 @@ export default function Payment() {
       }
     }
   }, [isClient, isConnected, isConnecting, connect, connectors]);
+
+  // 自动切换到 Monad 网络
+  useEffect(() => {
+    if (isConnected && chainId && chainId !== MONAD_CHAIN.id) {
+      const autoSwitchNetwork = async () => {
+        try {
+          console.log(`检测到当前网络: ${chainId}, 需要切换到 Monad (${MONAD_CHAIN.id})`);
+          toast.loading('正在切换到 Monad 网络...', { id: 'switch-network' });
+          
+          await switchChain({ chainId: MONAD_CHAIN.id });
+          
+          toast.success('已切换到 Monad 网络', { id: 'switch-network' });
+        } catch (error) {
+          console.error('自动切换网络失败:', error);
+          
+          // 如果是用户拒绝
+          if (error.code === 4001 || error.code === 'ACTION_REJECTED') {
+            toast.error('请手动切换到 Monad 网络', { id: 'switch-network' });
+          } 
+          // 如果网络不存在，需要添加
+          else if (error.code === 4902 || error.message?.includes('Unrecognized chain')) {
+            toast.error('请先在钱包中添加 Monad 网络', { 
+              id: 'switch-network',
+              duration: 5000 
+            });
+            // 可以尝试添加网络
+            await addMonadNetwork();
+          } 
+          else {
+            toast.error('切换网络失败，请手动切换', { id: 'switch-network' });
+          }
+        }
+      };
+
+      autoSwitchNetwork();
+    }
+  }, [isConnected, chainId, switchChain]);
+
+  // 添加 Monad 网络到钱包
+  const addMonadNetwork = async () => {
+    try {
+      if (!window.ethereum) return;
+
+      toast.loading('正在添加 Monad 网络...', { id: 'add-network' });
+
+      await window.ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [{
+          chainId: `0x${MONAD_CHAIN.id.toString(16)}`, // 转换为十六进制
+          chainName: MONAD_CHAIN.name,
+          nativeCurrency: MONAD_CHAIN.nativeCurrency,
+          rpcUrls: MONAD_CHAIN.rpcUrls?.default?.http || ['https://testnet-rpc.monad.xyz'],
+          blockExplorerUrls: [MONAD_CHAIN.blockExplorers?.default?.url],
+        }],
+      });
+
+      toast.success('Monad 网络已添加', { id: 'add-network' });
+    } catch (error) {
+      console.error('添加网络失败:', error);
+      toast.error('添加网络失败', { id: 'add-network' });
+    }
+  };
 
   const fetchOrder = async () => {
     try {
@@ -284,16 +347,43 @@ export default function Payment() {
           </div>
         ) : (
           <div className="space-y-4">
+            {/* 网络状态提示 */}
+            {chainId !== MONAD_CHAIN.id && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p className="text-sm text-yellow-800 mb-2 font-medium">⚠️ 网络不匹配</p>
+                <p className="text-xs text-yellow-700 mb-3">
+                  当前网络: {chainId} | 需要: Monad ({MONAD_CHAIN.id})
+                </p>
+                <button
+                  onClick={async () => {
+                    try {
+                      await switchChain({ chainId: MONAD_CHAIN.id });
+                    } catch (error) {
+                      if (error.code === 4902) {
+                        await addMonadNetwork();
+                      }
+                    }
+                  }}
+                  className="w-full bg-yellow-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-yellow-700 transition-colors"
+                >
+                  切换到 Monad 网络
+                </button>
+              </div>
+            )}
+
             <div className="bg-green-50 border border-green-200 rounded-lg p-4">
               <p className="text-sm text-green-800 mb-1">已连接钱包</p>
               <p className="text-xs font-mono text-green-600">
                 {address?.slice(0, 6)}...{address?.slice(-4)}
               </p>
+              {chainId === MONAD_CHAIN.id && (
+                <p className="text-xs text-green-600 mt-1">✓ Monad 网络</p>
+              )}
             </div>
 
             <button
               onClick={handlePay}
-              disabled={paying || order.status !== 'pending'}
+              disabled={paying || order.status !== 'pending' || chainId !== MONAD_CHAIN.id}
               className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-4 rounded-lg font-bold hover:from-green-600 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-all flex items-center justify-center space-x-2"
             >
               {paying ? (

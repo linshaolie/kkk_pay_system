@@ -152,5 +152,19 @@
     "paid_at": null,
     "created_at": "2026-01-17T09:05:03.162Z",
     "updated_at": "2026-01-17T09:05:03.162Z"
+  },
+  {
+    "id": 12,
+    "order_id": "2701eab6-1792-4880-ac76-398f6009e2f1",
+    "merchant_id": 2,
+    "product_id": "K002",
+    "product_name": "百事可乐",
+    "amount": 0.01,
+    "status": "pending",
+    "tx_hash": null,
+    "user_wallet": null,
+    "paid_at": null,
+    "created_at": "2026-01-17T10:00:34.835Z",
+    "updated_at": "2026-01-17T10:00:34.835Z"
   }
 ]
