@@ -103,7 +103,7 @@ export default function Scan() {
     stopVideoStream(); // 停止视频流
     setScanning(false);
     
-    const productId = prompt('请输入商品ID：');
+    const productId = prompt('请输入商品ID：K001');
     if (productId && productId.trim()) {
       // 用户输入了有效的商品ID，提交订单
       handleScanResult(productId.trim());
