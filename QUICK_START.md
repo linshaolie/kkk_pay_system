@@ -107,8 +107,8 @@ JWT_SECRET=your_random_secret_key
 
 # 区块链配置（如果要使用支付功能）
 MONAD_RPC_URL=https://your-monad-rpc-url
-CONTRACT_ADDRESS=0xYourContractAddress
-USDT_CONTRACT_ADDRESS=0xYourUSDTAddress
+CONTRACT_ADDRESS=0xba53E893Ba76B8971E913d2fB83970aC7CC7a25E
+USDT_CONTRACT_ADDRESS=0xDA658fD4Bb122ff322eDb3E8fEA343Ba5f3049E2
 ```
 
 如果只是测试基本功能，可以不配置区块链相关内容。

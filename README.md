@@ -95,8 +95,6 @@ JWT_SECRET=your_jwt_secret_key_change_this_in_production
 
 # Monad 配置（可选，测试阶段可留空）
 MONAD_RPC_URL=https://testnet-rpc.monad.xyz
-CONTRACT_ADDRESS=0xYourContractAddress
-USDT_CONTRACT_ADDRESS=0xYourUSDTAddress
 
 # 前端地址
 MOBILE_URL=http://localhost:5173
@@ -118,8 +116,8 @@ cp .env.example .env
 ```env
 VITE_API_URL=http://localhost:3000/api
 VITE_MONAD_RPC_URL=https://testnet-rpc.monad.xyz
-VITE_CONTRACT_ADDRESS=0xYourContractAddress
-VITE_USDT_ADDRESS=0xYourUSDTAddress
+VITE_CONTRACT_ADDRESS=0xba53E893Ba76B8971E913d2fB83970aC7CC7a25E
+VITE_USDT_ADDRESS=0xDA658fD4Bb122ff322eDb3E8fEA343Ba5f3049E2
 VITE_WALLET_CONNECT_PROJECT_ID=your_walletconnect_project_id
 ```
 

@@ -14,6 +14,7 @@ class BlockchainService {
     this.provider = null;
     this.contract = null;
     this.isListening = false;
+    this.eventListenerSupported = true; // 标记 RPC 是否支持事件监听
   }
 
   // 初始化
@@ -48,6 +49,30 @@ class BlockchainService {
     try {
       console.log('开始监听支付完成事件...');
 
+      // 测试 RPC 是否支持 eth_newFilter
+      try {
+        await this.provider.send('eth_newFilter', [{
+          address: this.contract.target,
+          topics: []
+        }]);
+      } catch (testError) {
+        if (testError.code === 'UNKNOWN_ERROR' && testError.error?.code === -32601) {
+          console.warn('⚠️  当前 RPC 节点不支持 eth_newFilter 方法');
+          console.warn('💡 影响：');
+          console.warn('   ✅ 基本功能正常（创建订单、生成二维码）');
+          console.warn('   ❌ 无法自动监听链上支付完成事件');
+          console.warn('   ❌ 商家端不会自动收到支付语音播报');
+          console.warn('');
+          console.warn('🔧 解决方案：');
+          console.warn('   1. 使用支持完整 JSON-RPC 的 Monad 节点');
+          console.warn('   2. 或在生产环境部署后联系 Monad 团队获取节点信息');
+          console.warn('   3. 临时方案：用户支付后商家手动刷新订单列表');
+          this.eventListenerSupported = false;
+          return;
+        }
+      }
+
+      // 设置事件监听器
       this.contract.on('PaymentCompleted', async (orderId, user, merchant, amount, timestamp, event) => {
         try {
           console.log('收到支付完成事件:', {
@@ -90,9 +115,12 @@ class BlockchainService {
       });
 
       this.isListening = true;
-      console.log('合约事件监听已启动');
+      console.log('✅ 合约事件监听已启动');
+      console.log('📡 等待链上支付事件...');
     } catch (error) {
-      console.error('启动事件监听失败:', error);
+      console.error('⚠️  启动事件监听失败:', error.message);
+      this.isListening = false;
+      this.eventListenerSupported = false;
     }
   }
 

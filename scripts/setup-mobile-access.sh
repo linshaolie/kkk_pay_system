@@ -38,7 +38,7 @@ mkdir -p frontend/user-payment
 cat > frontend/user-payment/.env << EOF
 VITE_API_URL=http://$IP:3000/api
 VITE_MONAD_RPC_URL=https://testnet-rpc.monad.xyz
-VITE_CONTRACT_ADDRESS=0xYourPaymentContractAddress
+VITE_CONTRACT_ADDRESS=0xba53E893Ba76B8971E913d2fB83970aC7CC7a25E
 VITE_WALLET_CONNECT_PROJECT_ID=1fba176f84da8ad01ca69caa0074f292
 EOF
 

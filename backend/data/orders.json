@@ -110,5 +110,19 @@
     "paid_at": null,
     "created_at": "2026-01-17T07:06:26.550Z",
     "updated_at": "2026-01-17T07:06:26.550Z"
+  },
+  {
+    "id": 9,
+    "order_id": "f21d2c19-de49-4875-83f8-e1e64ce01209",
+    "merchant_id": 2,
+    "product_id": "K004",
+    "product_name": "康师傅冰红茶",
+    "amount": 0.008,
+    "status": "pending",
+    "tx_hash": null,
+    "user_wallet": null,
+    "paid_at": null,
+    "created_at": "2026-01-17T07:28:45.261Z",
+    "updated_at": "2026-01-17T07:28:45.261Z"
   }
 ]

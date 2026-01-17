@@ -43,7 +43,7 @@ PORT=3000
 NODE_ENV=production
 JWT_SECRET=your_secret_key
 MONAD_RPC_URL=https://testnet-rpc.monad.xyz
-CONTRACT_ADDRESS=0xYourAddress
+CONTRACT_ADDRESS=0xba53E893Ba76B8971E913d2fB83970aC7CC7a25E
 
 # 4. 等待部署完成
 获取部署 URL

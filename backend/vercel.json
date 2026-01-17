@@ -75,7 +75,7 @@ cd frontend/user-payment
 cat > .env.production << 'EOF'
 VITE_API_URL=https://your-backend.up.railway.app/api
 VITE_MONAD_RPC_URL=https://testnet-rpc.monad.xyz
-VITE_CONTRACT_ADDRESS=0xYourContractAddress
+VITE_CONTRACT_ADDRESS=0xDA658fD4Bb122ff322eDb3E8fEA343Ba5f3049E2
 VITE_WALLET_CONNECT_PROJECT_ID=1fba176f84da8ad01ca69caa0074f292
 EOF
 
@@ -103,7 +103,7 @@ PORT=3000
 NODE_ENV=production
 JWT_SECRET=your_production_secret_key
 MONAD_RPC_URL=https://testnet-rpc.monad.xyz
-CONTRACT_ADDRESS=0xYourContractAddress
+CONTRACT_ADDRESS=0xba53E893Ba76B8971E913d2fB83970aC7CC7a25E
 MOBILE_URL=https://kkk-pos-mobile.vercel.app
 DESKTOP_URL=https://kkk-pos-desktop.vercel.app
 PAYMENT_URL=https://kkk-pos-payment.vercel.app
