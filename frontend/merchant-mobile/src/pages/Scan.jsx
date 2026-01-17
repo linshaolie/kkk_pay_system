@@ -42,9 +42,10 @@ export default function Scan() {
 
       reader.decodeFromVideoDevice(selectedDeviceId, 'video', async (result, err) => {
         if (result) {
+          // 立即停止扫描，避免重复触发
           setScanning(false);
+          reader.reset(); // 立即释放摄像头资源
           await handleScanResult(result.getText());
-          reader.reset();
         }
       });
     } catch (error) {
@@ -69,6 +70,8 @@ export default function Scan() {
       }, 1000);
     } catch (error) {
       console.error('创建订单失败:', error);
+      toast.error('创建订单失败，请重试');
+      // 失败后重新启动扫描
       setScanning(true);
       if (codeReader) {
         startScanning(codeReader);
