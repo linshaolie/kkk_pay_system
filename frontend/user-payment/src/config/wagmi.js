@@ -1,34 +1,25 @@
-import { createConfig, configureChains } from 'wagmi';
-import { publicProvider } from 'wagmi/providers/public';
-import { InjectedConnector } from 'wagmi/connectors/injected';
-import { WalletConnectConnector } from 'wagmi/connectors/walletConnect';
-import { MONAD_CHAIN, WALLET_CONNECT_PROJECT_ID } from './index';
+import { createConfig, http } from 'wagmi';
+import { injected, metaMask } from 'wagmi/connectors';
+import { MONAD_CHAIN } from './index';
 
-const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [MONAD_CHAIN],
-  [publicProvider()]
-);
+// Get RPC URL - 确保安全访问
+let rpcUrl = 'https://testnet-rpc.monad.xyz';
+try {
+  if (MONAD_CHAIN?.rpcUrls?.default?.http?.[0]) {
+    rpcUrl = MONAD_CHAIN.rpcUrls.default.http[0];
+  }
+} catch (error) {
+  console.warn('Failed to get RPC URL from chain config:', error);
+}
 
+// Create wagmi config
 export const config = createConfig({
-  autoConnect: true,
+  chains: [MONAD_CHAIN],
   connectors: [
-    new InjectedConnector({
-      chains,
-      options: {
-        name: 'Injected',
-        shimDisconnect: true,
-      },
-    }),
-    new WalletConnectConnector({
-      chains,
-      options: {
-        projectId: WALLET_CONNECT_PROJECT_ID,
-        showQrModal: true,
-      },
-    }),
+    injected(),
+    metaMask(),
   ],
-  publicClient,
-  webSocketPublicClient,
+  transports: {
+    [MONAD_CHAIN.id]: http(rpcUrl),
+  },
 });
-
-export { chains };

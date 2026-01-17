@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAccount, useConnect, useDisconnect, useSwitchNetwork } from 'wagmi';
+import { useAccount, useConnect, useDisconnect, useSwitchChain } from 'wagmi';
 import { ethers } from 'ethers';
 import api from '../utils/api';
 import { API_ENDPOINTS } from '../config';
@@ -13,18 +13,41 @@ export default function Payment() {
   const { orderId } = useParams();
   const navigate = useNavigate();
   const { address, isConnected, connector } = useAccount();
-  const { connect, connectors, isLoading: isConnecting } = useConnect();
+  const { connect, connectors, isPending: isConnecting } = useConnect();
   const { disconnect } = useDisconnect();
-  const { switchNetwork } = useSwitchNetwork();
+  const { switchChain } = useSwitchChain();
 
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null); // 'success', 'failed', null
+  const [isClient, setIsClient] = useState(false);
+  const hasTriedAutoConnect = useRef(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     fetchOrder();
   }, [orderId]);
+
+  // 自动连接钱包（仅在首次加载时尝试一次）
+  useEffect(() => {
+    if (isClient && !hasTriedAutoConnect.current && !isConnected && !isConnecting) {
+      // 检查是否有可用的注入钱包（如 MetaMask）
+      if (typeof window !== 'undefined' && window.ethereum) {
+        // 查找 injected connector
+        const injectedConnector = connectors.find((connector) => 
+          connector.type === 'injected'
+        );
+        if (injectedConnector) {
+          hasTriedAutoConnect.current = true;
+          connect({ connector: injectedConnector });
+        }
+      }
+    }
+  }, [isClient, isConnected, isConnecting, connect, connectors]);
 
   const fetchOrder = async () => {
     try {
@@ -84,8 +107,8 @@ export default function Payment() {
       const network = await ethersProvider.getNetwork();
       if (Number(network.chainId) !== MONAD_CHAIN.id) {
         toast.error('请切换到 Monad 网络');
-        if (switchNetwork) {
-          switchNetwork(MONAD_CHAIN.id);
+        if (switchChain) {
+          switchChain({ chainId: MONAD_CHAIN.id });
         }
         setPaying(false);
         return;
