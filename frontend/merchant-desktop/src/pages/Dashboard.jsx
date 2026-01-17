@@ -17,6 +17,65 @@ export default function Dashboard() {
     completed_orders: 0,
     total_amount: 0,
   });
+  const [isPolling, setIsPolling] = useState(false); // 是否正在轮询
+
+  // 轮询订单状态
+  useEffect(() => {
+    if (!currentOrder || currentOrder.order.status !== 'pending') {
+      return;
+    }
+
+    setIsPolling(true);
+    console.log('开始轮询订单状态:', currentOrder.order.order_id);
+
+    // 立即检查一次
+    checkOrderStatus(currentOrder.order.order_id);
+
+    // 每3秒轮询一次
+    const pollInterval = setInterval(() => {
+      checkOrderStatus(currentOrder.order.order_id);
+    }, 3000);
+
+    return () => {
+      clearInterval(pollInterval);
+      setIsPolling(false);
+      console.log('停止轮询订单状态');
+    };
+  }, [currentOrder?.order.order_id]);
+
+  const checkOrderStatus = async (orderId) => {
+    try {
+      const response = await api.get(API_ENDPOINTS.ORDER_BY_ID(orderId));
+      if (response.success) {
+        const order = response.data;
+        
+        // 如果订单状态变为已完成
+        if (order.status === 'completed' && currentOrder.order.status === 'pending') {
+          console.log('检测到订单已支付:', orderId);
+          toast.success('支付成功！');
+          
+          // 语音播报
+          speakPayment(order.amount);
+          
+          // 清除当前订单
+          setCurrentOrder(null);
+          
+          // 刷新统计数据
+          fetchStats();
+        }
+        
+        // 如果订单被取消
+        if (order.status === 'cancelled' && currentOrder.order.status === 'pending') {
+          console.log('检测到订单已取消:', orderId);
+          toast('订单已取消', { icon: '❌' });
+          setCurrentOrder(null);
+        }
+      }
+    } catch (error) {
+      console.error('轮询订单状态失败:', error);
+      // 轮询失败不显示错误提示，避免干扰用户
+    }
+  };
 
   useEffect(() => {
     // 连接 Socket.IO
@@ -172,6 +231,14 @@ export default function Dashboard() {
                   </div>
                   <h2 className="text-2xl font-bold text-gray-800">待支付订单</h2>
                   <p className="text-gray-600 mt-2">请顾客扫描二维码完成支付</p>
+                  
+                  {/* 轮询状态指示器 */}
+                  {isPolling && (
+                    <div className="mt-4 inline-flex items-center space-x-2 text-sm text-blue-600">
+                      <div className="w-2 h-2 bg-blue-600 rounded-full animate-ping"></div>
+                      <span>正在监听支付状态...</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* 订单信息 */}
@@ -207,6 +274,13 @@ export default function Dashboard() {
                       level="H"
                       includeMargin={true}
                     />
+                    <a href={currentOrder.paymentUrl} target="_blank" rel="noopener noreferrer">
+                      <Button>
+                        <Link href={currentOrder.paymentUrl}>
+                          <span>Open in new tab</span>
+                        </Link>
+                      </Button>
+                    </a>
                   </div>
                   <p className="text-gray-600 text-sm mt-4">
                     请使用钱包扫描二维码支付

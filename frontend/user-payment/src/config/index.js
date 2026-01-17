@@ -31,7 +31,7 @@ export const MONAD_CHAIN = defineChain({
 });
 
 // 支付合约地址
-export const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS || '';
+export const CONTRACT_ADDRESS = '0xba53E893Ba76B8971E913d2fB83970aC7CC7a25E';
 
 // WalletConnect 项目 ID
 export const WALLET_CONNECT_PROJECT_ID = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID || '';
