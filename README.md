@@ -209,6 +209,7 @@ npm run dev
 - **[快速开始](./QUICK_START.md)** - 最简单的启动指南
 - **[钱包配置](./docs/WALLET_CONFIG.md)** - Web3 钱包支付配置
 - **[移动访问](./docs/MOBILE_ACCESS.md)** - 手机访问本地服务
+- **[HTTPS 配置](./docs/HTTPS_SETUP.md)** - 本地 HTTPS 开发环境配置
 
 ### 部署文档
 - **[Zeabur 部署](./docs/ZEABUR_DEPLOY.md)** - ⭐️ 推荐：前后端一站式部署
