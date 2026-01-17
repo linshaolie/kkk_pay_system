@@ -18,7 +18,12 @@ router.post('/',
   [
     body('productId').trim().notEmpty().withMessage('商品ID不能为空'),
   ],
-  (req, res) => createOrder(req, res, req.app.get('io'))
+  (req, res) => createOrder(
+    req, 
+    res, 
+    req.app.get('io'),
+    req.app.get('blockchainService')
+  )
 );
 
 // 获取订单详情（无需认证，用于用户支付页面）
@@ -34,9 +39,14 @@ router.get('/merchant/pending', authMiddleware, getPendingOrders);
 router.put('/:orderId/cancel',
   authMiddleware,
   [
-    param('orderId').isUUID().withMessage('无效的订单ID'),
+    param('orderId').notEmpty().withMessage('订单ID不能为空'),
   ],
-  (req, res) => cancelOrder(req, res, req.app.get('io'))
+  (req, res) => cancelOrder(
+    req, 
+    res, 
+    req.app.get('io'),
+    req.app.get('blockchainService')
+  )
 );
 
 // 获取今日统计（需要认证）

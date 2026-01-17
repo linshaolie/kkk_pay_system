@@ -54,7 +54,7 @@ npm run dev
 ✅ **完成！** 现在访问：
 - 商家手机端: http://localhost:5173
 - 商家电脑端: http://localhost:5174
-- 用户支付端: http://localhost:5175
+- 用户支付端: http://localhost:5176
 
 ## 🎯 首次使用
 

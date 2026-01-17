@@ -374,7 +374,7 @@ Authorization: Bearer {token}
       "merchant_wallet": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
       "created_at": "2024-01-01T00:00:00.000Z"
     },
-    "paymentUrl": "http://localhost:5175/pay/550e8400-e29b-41d4-a716-446655440000"
+    "paymentUrl": "http://localhost:5176/pay/550e8400-e29b-41d4-a716-446655440000"
   }
 }
 ```

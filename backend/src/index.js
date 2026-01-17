@@ -55,6 +55,11 @@ app.use(express.urlencoded({ extended: true }));
 // 将 io 实例存储到 app 中，供路由使用
 app.set('io', io);
 
+// 初始化区块链服务并存储到 app 中
+const blockchainService = new BlockchainService(io);
+await blockchainService.initialize();
+app.set('blockchainService', blockchainService);
+
 // 路由
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
@@ -92,10 +97,6 @@ io.on('connection', (socket) => {
 // 初始化数据文件
 await initializeData();
 
-// 初始化区块链服务
-const blockchainService = new BlockchainService(io);
-blockchainService.initialize();
-
 // 启动服务器
 const PORT = config.port;
 const protocol = config.useHttps ? 'https' : 'http';
@@ -116,7 +117,11 @@ httpServer.listen(PORT, '0.0.0.0', () => {
 // 优雅关闭
 process.on('SIGTERM', () => {
   console.log('SIGTERM signal received: closing HTTP server');
-  blockchainService.stopListening();
+  const blockchainService = app.get('blockchainService');
+  if (blockchainService) {
+    blockchainService.stopListening();
+    blockchainService.stopAllPolling();
+  }
   httpServer.close(() => {
     console.log('HTTP server closed');
     process.exit(0);
@@ -125,7 +130,11 @@ process.on('SIGTERM', () => {
 
 process.on('SIGINT', () => {
   console.log('SIGINT signal received: closing HTTP server');
-  blockchainService.stopListening();
+  const blockchainService = app.get('blockchainService');
+  if (blockchainService) {
+    blockchainService.stopListening();
+    blockchainService.stopAllPolling();
+  }
   httpServer.close(() => {
     console.log('HTTP server closed');
     process.exit(0);

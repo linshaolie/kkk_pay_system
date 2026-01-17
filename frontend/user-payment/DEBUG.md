@@ -1,7 +1,7 @@
 # 前端访问问题诊断
 
 ## 当前状态
-- 前端服务器: 运行在 https://localhost:5175
+- 前端服务器: 运行在 https://localhost:5176
 - 后端服务器: 运行在 http://localhost:3000
 
 ## 如果页面空白，请按以下步骤检查：
@@ -31,17 +31,17 @@
 
 ### 3. 测试页面
 访问以下 URL 进行测试：
-- 首页: https://localhost:5175/
-- 测试页: https://localhost:5175/test
-- 支付页: https://localhost:5175/pay/测试订单ID
+- 首页: https://localhost:5176/
+- 测试页: https://localhost:5176/test
+- 支付页: https://localhost:5176/pay/测试订单ID
 
 ### 4. 网络检查
 ```bash
 # 检查端口是否监听
-lsof -ti:5175
+lsof -ti:5176
 
 # 测试 HTTPS 连接
-curl -k https://localhost:5175
+curl -k https://localhost:5176
 ```
 
 ### 5. 清除缓存

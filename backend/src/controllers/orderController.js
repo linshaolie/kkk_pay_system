@@ -10,7 +10,7 @@ const generateNumericOrderId = () => {
 };
 
 // 创建订单
-export const createOrder = async (req, res, io) => {
+export const createOrder = async (req, res, io, blockchainService) => {
   try {
     const { productId } = req.body;
     const merchantId = req.user.id;
@@ -43,6 +43,11 @@ export const createOrder = async (req, res, io) => {
 
     // 生成支付链接
     const paymentUrl = `${config.frontend.paymentUrl}/pay/${orderId}`;
+
+    // 开始轮询订单支付状态（作为事件监听的备份方案）
+    if (blockchainService) {
+      blockchainService.startPollingOrder(orderId);
+    }
 
     // 通过 Socket.IO 通知商家电脑端
     if (io) {
@@ -152,7 +157,7 @@ export const getPendingOrders = async (req, res) => {
 };
 
 // 取消订单
-export const cancelOrder = async (req, res, io) => {
+export const cancelOrder = async (req, res, io, blockchainService) => {
   try {
     const { orderId } = req.params;
     const merchantId = req.user.id;
@@ -183,6 +188,11 @@ export const cancelOrder = async (req, res, io) => {
     }
 
     await Order.updateStatus(orderId, 'cancelled');
+
+    // 停止轮询该订单
+    if (blockchainService) {
+      blockchainService.stopPollingOrder(orderId);
+    }
 
     // 通知商家电脑端
     if (io) {

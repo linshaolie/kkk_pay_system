@@ -105,7 +105,7 @@ cd frontend/user-payment && npm run dev
 ### 本地测试
 
 - [ ] 后端启动成功，没有致命错误
-- [ ] 访问 `http://localhost:5175/pay/{orderId}` 能看到支付页面
+- [ ] 访问 `http://localhost:5176/pay/{orderId}` 能看到支付页面
 - [ ] 能够连接钱包（WalletConnect）
 - [ ] 钱包显示正确的网络（Monad）
 - [ ] 能够查看订单详情

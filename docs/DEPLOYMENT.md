@@ -91,7 +91,7 @@ USDT_CONTRACT_ADDRESS=0xDA658fD4Bb122ff322eDb3E8fEA343Ba5f3049E2
 # 前端地址
 MOBILE_URL=http://localhost:5173
 DESKTOP_URL=http://localhost:5174
-PAYMENT_URL=http://localhost:5175
+PAYMENT_URL=http://localhost:5176
 ```
 
 #### 初始化数据库表
@@ -130,7 +130,7 @@ npm install
 # 创建 .env 文件
 echo "VITE_API_URL=http://localhost:3000/api" > .env
 echo "VITE_SOCKET_URL=http://localhost:3000" >> .env
-echo "VITE_PAYMENT_URL=http://localhost:5175" >> .env
+echo "VITE_PAYMENT_URL=http://localhost:5176" >> .env
 ```
 
 #### 用户支付端
@@ -194,7 +194,7 @@ npm run dev
 
 - **商家手机端**: http://localhost:5173
 - **商家电脑端**: http://localhost:5174
-- **用户支付端**: http://localhost:5175
+- **用户支付端**: http://localhost:5176
 - **后端 API**: http://localhost:3000
 
 ## 📱 首次使用

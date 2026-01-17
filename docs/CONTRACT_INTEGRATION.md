@@ -110,7 +110,7 @@ CONTRACT_ADDRESS=0xYourContractAddressHere
 MONAD_RPC_URL=https://testnet-rpc.monad.xyz
 
 # 前端 URL
-PAYMENT_URL=http://localhost:5175/pay
+PAYMENT_URL=http://localhost:5176/pay
 ```
 
 ### 步骤 2: 更新前端配置
@@ -180,7 +180,7 @@ cd frontend/user-payment
 npm run dev
 
 # 访问支付页面
-http://localhost:5175/pay/{orderId}
+http://localhost:5176/pay/{orderId}
 ```
 
 **测试步骤**:

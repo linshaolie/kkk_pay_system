@@ -34,16 +34,18 @@ kkk_pos/
 
 ### 用户端
 - 👛 **钱包连接**：通过 WalletConnect 连接钱包
-- 💰 **USDT支付**：使用智能合约托管支付
+- 💰 **MON支付**：使用 Monad 原生代币支付
 - 📱 **扫码支付**：扫描商家二维码完成支付
+- 🔄 **自动切换网络**：钱包自动切换到 Monad 网络
 
 ## 🚀 技术栈
 
 - **前端**：React 18 + Vite + TailwindCSS
 - **后端**：Node.js + Express + JSON 文件存储
-- **区块链**：Monad + ethers.js + WalletConnect
+- **区块链**：Monad Devnet + ethers.js + WalletConnect
 - **实时通信**：Socket.IO
-- **支付代币**：USDT（通过智能合约）
+- **支付代币**：MON（Monad 原生代币）
+- **支付确认**：事件监听 + 状态轮询（双重保障）
 
 ## 📋 前置要求
 
@@ -99,7 +101,7 @@ MONAD_RPC_URL=https://testnet-rpc.monad.xyz
 # 前端地址
 MOBILE_URL=http://localhost:5173
 DESKTOP_URL=http://localhost:5174
-PAYMENT_URL=http://localhost:5175
+PAYMENT_URL=http://localhost:5176
 ```
 
 #### 用户支付端配置（如需钱包支付）
@@ -115,9 +117,8 @@ cp .env.example .env
 
 ```env
 VITE_API_URL=http://localhost:3000/api
-VITE_MONAD_RPC_URL=https://testnet-rpc.monad.xyz
+VITE_MONAD_RPC_URL=https://testnet-rpc.monad.xyz  # 可选，使用钱包默认 RPC
 VITE_CONTRACT_ADDRESS=0xba53E893Ba76B8971E913d2fB83970aC7CC7a25E
-VITE_USDT_ADDRESS=0xDA658fD4Bb122ff322eDb3E8fEA343Ba5f3049E2
 VITE_WALLET_CONNECT_PROJECT_ID=your_walletconnect_project_id
 ```
 
@@ -154,7 +155,7 @@ npm run dev
 
 - 商家手机端：http://localhost:5173
 - 商家电脑端：http://localhost:5174
-- 用户支付端：http://localhost:5175
+- 用户支付端：http://localhost:5176
 - 后端 API：http://localhost:3000
 
 ## 🔄 业务流程
@@ -165,10 +166,12 @@ npm run dev
 4. 订单信息实时同步到商家电脑端
 5. 电脑端生成支付二维码（包含订单ID的HTTP链接）
 6. 用户扫码打开支付页面
-7. 用户通过 WalletConnect 连接钱包
+7. 用户通过 WalletConnect 连接钱包（自动切换到 Monad 网络）
 8. 页面显示订单详情，用户确认支付
-9. 智能合约处理 USDT 托管支付
-10. 后端监听合约事件，确认支付完成
+9. 智能合约处理 MON 支付（原生代币转账）
+10. 后端通过双重机制确认支付：
+    - **事件监听**：实时监听合约 `PaymentMade` 事件（优先）
+    - **状态轮询**：每5秒查询合约 `isOrderPaid` 函数（备用）
 11. 电脑端收到通知，语音播报"收款到账 XXX"
 12. 订单状态更新为"已完成"
 
@@ -178,15 +181,15 @@ npm run dev
 
 **需要配置：**
 - ✅ WalletConnect Project ID
-- ✅ Monad RPC URL
 - ✅ 智能合约地址
-- ✅ USDT 合约地址
+- 🔧 Monad RPC URL（可选，使用钱包默认 RPC）
 
 **功能：**
 - ✅ 真实的钱包连接
-- ✅ 链上 USDT 支付
+- ✅ 链上 MON 支付（Monad 原生代币）
 - ✅ 智能合约托管
-- ✅ 自动确认支付
+- ✅ 自动切换到 Monad 网络
+- ✅ 双重支付确认（事件监听 + 状态轮询）
 
 ### 模式 B：测试模式（无需配置）
 
@@ -216,6 +219,9 @@ npm run dev
 
 ### 开发文档
 - **[API 文档](./docs/API.md)** - 完整的 API 参考
+- **[合约集成](./docs/CONTRACT_INTEGRATION.md)** - 智能合约集成指南
+- **[订单轮询](./docs/ORDER_POLLING.md)** - ⭐️ 支付状态轮询机制
+- **[自动切换网络](./docs/AUTO_SWITCH_NETWORK.md)** - 钱包自动切换 Monad 网络
 
 ## 🎯 快速测试
 
@@ -249,18 +255,39 @@ backend/data/
 
 ## 🔐 智能合约接口
 
-需要合约支持以下功能：
+系统使用的智能合约支持以下核心功能：
 
+### 支付函数
 ```solidity
-// 创建支付订单
-function createPayment(bytes32 orderId, uint256 amount, address merchant) external
-
-// 用户支付
-function pay(bytes32 orderId) external
-
-// 确认支付事件
-event PaymentCompleted(bytes32 orderId, address user, address merchant, uint256 amount)
+// 用户支付（MON 原生代币）
+function pay(uint256 orderId, address token, uint256 amount) external payable
 ```
+
+### 查询函数（用于状态轮询）
+```solidity
+// 检查订单是否已支付
+function isOrderPaid(uint256 orderId) public view returns (bool)
+
+// 获取支付详情
+function getPayment(uint256 orderId) public view returns (PaymentInfo memory)
+```
+
+### 支付事件（用于实时监听）
+```solidity
+event PaymentMade(
+  uint256 indexed orderId,
+  address indexed payer,
+  address indexed token,
+  uint256 amount,
+  uint256 timestamp
+)
+```
+
+**支付确认双重机制：**
+1. **事件监听（优先）**：实时监听 `PaymentMade` 事件，1-2秒内确认
+2. **状态轮询（备用）**：每5秒调用 `isOrderPaid` 查询，确保可靠性
+
+详细信息请参阅 [订单轮询文档](./docs/ORDER_POLLING.md) 和 [合约集成文档](./docs/CONTRACT_INTEGRATION.md)。
 
 ## 🐛 故障排除
 

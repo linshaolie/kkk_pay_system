@@ -269,12 +269,12 @@ export default function Dashboard() {
                 <div className="flex flex-col items-center mb-6">
                   <div className="bg-white p-6 rounded-2xl shadow-lg">
                     <QRCodeSVG
-                      value={currentOrder.paymentUrl}
+                      value={currentOrder.paymentUrl.replace('5175', '5176')}
                       size={280}
                       level="H"
                       includeMargin={true}
                     />
-                    <a href={currentOrder.paymentUrl} target="_blank" rel="noopener noreferrer">
+                    <a href={currentOrder.paymentUrl.replace('5175', '5176')} target="_blank" rel="noopener noreferrer">
                       goto Pay
                     </a>
                   </div>

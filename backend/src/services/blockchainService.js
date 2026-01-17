@@ -20,6 +20,7 @@ class BlockchainService {
     this.contract = null;
     this.isListening = false;
     this.eventListenerSupported = true; // 标记 RPC 是否支持事件监听
+    this.pollingOrders = new Map(); // 存储正在轮询的订单 { orderId: intervalId }
   }
 
   // 初始化
@@ -171,6 +172,137 @@ class BlockchainService {
       throw new Error('Provider not initialized');
     }
     return await this.provider.getTransactionReceipt(txHash);
+  }
+
+  // 开始轮询订单支付状态
+  async startPollingOrder(orderId) {
+    // 如果事件监听正常工作，则不需要轮询
+    if (this.eventListenerSupported && this.isListening) {
+      console.log(`📡 事件监听已启用，订单 ${orderId} 无需轮询`);
+      return;
+    }
+
+    // 如果已经在轮询，跳过
+    if (this.pollingOrders.has(orderId)) {
+      console.log(`⏱️  订单 ${orderId} 已在轮询中`);
+      return;
+    }
+
+    if (!this.contract) {
+      console.warn('⚠️  合约未初始化，无法开始轮询');
+      return;
+    }
+
+    console.log(`🔄 开始轮询订单 ${orderId} 的链上支付状态...`);
+
+    // 每5秒查询一次
+    const intervalId = setInterval(async () => {
+      try {
+        await this.checkOrderPaymentStatus(orderId);
+      } catch (error) {
+        console.error(`❌ 轮询订单 ${orderId} 状态失败:`, error.message);
+      }
+    }, 5000);
+
+    // 保存 intervalId
+    this.pollingOrders.set(orderId, intervalId);
+
+    // 设置最长轮询时间：30分钟（支付超时时间）
+    setTimeout(() => {
+      this.stopPollingOrder(orderId);
+      console.log(`⏰ 订单 ${orderId} 轮询超时（30分钟），已停止轮询`);
+    }, 30 * 60 * 1000);
+  }
+
+  // 停止轮询订单
+  stopPollingOrder(orderId) {
+    const intervalId = this.pollingOrders.get(orderId);
+    if (intervalId) {
+      clearInterval(intervalId);
+      this.pollingOrders.delete(orderId);
+      console.log(`⏹️  已停止轮询订单 ${orderId}`);
+    }
+  }
+
+  // 检查订单支付状态
+  async checkOrderPaymentStatus(orderId) {
+    try {
+      // 先查询后端订单状态
+      const order = await Order.findByOrderId(orderId);
+      
+      if (!order) {
+        console.warn(`⚠️  订单 ${orderId} 不存在`);
+        this.stopPollingOrder(orderId);
+        return;
+      }
+
+      // 如果订单已经完成或取消，停止轮询
+      if (order.status === 'completed' || order.status === 'cancelled') {
+        console.log(`✅ 订单 ${orderId} 状态已更新为 ${order.status}，停止轮询`);
+        this.stopPollingOrder(orderId);
+        return;
+      }
+
+      // 查询合约：订单是否已支付
+      const orderIdBigInt = BigInt(orderId);
+      const isPaid = await this.contract.isOrderPaid(orderIdBigInt);
+
+      if (isPaid) {
+        console.log(`💰 检测到订单 ${orderId} 已在链上支付！`);
+
+        // 获取支付详情
+        const paymentInfo = await this.contract.getPayment(orderIdBigInt);
+        
+        console.log('链上支付信息:', {
+          orderId: paymentInfo.orderId.toString(),
+          payer: paymentInfo.payer,
+          token: paymentInfo.token,
+          amount: ethers.formatEther(paymentInfo.amount) + ' MON',
+          timestamp: new Date(Number(paymentInfo.timestamp) * 1000).toLocaleString(),
+        });
+
+        // 更新后端订单状态
+        await Order.updateStatus(
+          orderId,
+          'completed',
+          null, // txHash 通过轮询无法直接获取，可以为空
+          paymentInfo.payer
+        );
+
+        // 重新获取订单详情
+        const updatedOrder = await Order.findByOrderId(orderId);
+
+        if (updatedOrder) {
+          // 通知商家电脑端
+          this.io.to(`merchant_${updatedOrder.merchant_id}`).emit('payment_completed', {
+            orderId,
+            amount: updatedOrder.amount,
+            txHash: null,
+            userWallet: paymentInfo.payer,
+          });
+
+          console.log(`✅ 订单 ${orderId} 支付成功，已通知商家（通过轮询）`);
+        }
+
+        // 停止轮询
+        this.stopPollingOrder(orderId);
+      } else {
+        // 未支付，继续轮询（不输出日志避免刷屏）
+      }
+    } catch (error) {
+      console.error(`❌ 检查订单 ${orderId} 支付状态失败:`, error.message);
+      // 继续轮询，不停止
+    }
+  }
+
+  // 停止所有轮询
+  stopAllPolling() {
+    console.log('🛑 停止所有订单轮询...');
+    for (const [orderId, intervalId] of this.pollingOrders.entries()) {
+      clearInterval(intervalId);
+      console.log(`⏹️  已停止轮询订单 ${orderId}`);
+    }
+    this.pollingOrders.clear();
   }
 }
 

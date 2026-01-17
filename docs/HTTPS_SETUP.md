@@ -101,7 +101,7 @@ USE_HTTPS=true
 # 更新所有 URL 为 https
 MOBILE_URL=https://192.168.1.100:5173
 DESKTOP_URL=https://192.168.1.100:5174
-PAYMENT_URL=https://192.168.1.100:5175
+PAYMENT_URL=https://192.168.1.100:5176
 ```
 
 在前端项目的 `.env` 文件中也更新为 `https`。
@@ -129,7 +129,7 @@ npm run dev
 - Backend API: `https://192.168.1.100:3000`
 - 商家手机端: `https://192.168.1.100:5173`
 - 商家电脑端: `https://192.168.1.100:5174`
-- 用户支付端: `https://192.168.1.100:5175`
+- 用户支付端: `https://192.168.1.100:5176`
 
 ### 7. 手机端信任证书
 
@@ -251,8 +251,8 @@ https://localhost:5174 {
 }
 
 # User Payment
-https://localhost:5175 {
-    reverse_proxy localhost:5175
+https://localhost:5176 {
+    reverse_proxy localhost:5176
     tls internal
 }
 ```
@@ -266,7 +266,7 @@ caddy run
 ### 4. 访问服务
 
 - Backend API: `https://localhost:3443`
-- 其他服务: `https://localhost:5173/5174/5175`
+- 其他服务: `https://localhost:5173/5174/5176`
 
 ## 🔧 配置检查清单
 
@@ -277,7 +277,7 @@ caddy run
 USE_HTTPS=true
 MOBILE_URL=https://192.168.1.100:5173
 DESKTOP_URL=https://192.168.1.100:5174
-PAYMENT_URL=https://192.168.1.100:5175
+PAYMENT_URL=https://192.168.1.100:5176
 ```
 
 ### Frontend `.env` 文件
@@ -292,7 +292,7 @@ VITE_SOCKET_URL=https://192.168.1.100:3000
 ```env
 VITE_API_URL=https://192.168.1.100:3000/api
 VITE_SOCKET_URL=https://192.168.1.100:3000
-VITE_PAYMENT_URL=https://192.168.1.100:5175
+VITE_PAYMENT_URL=https://192.168.1.100:5176
 ```
 
 **user-payment/.env:**

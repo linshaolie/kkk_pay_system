@@ -13,7 +13,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: '0.0.0.0',
-    port: 5175,
+    port: 5176,
     // 临时禁用 HTTPS 以便测试
     // https: hasHttps ? {
     //   key: fs.readFileSync(keyPath),

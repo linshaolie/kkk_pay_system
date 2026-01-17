@@ -16,4 +16,4 @@ export const API_ENDPOINTS = {
 };
 
 export const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
-export const PAYMENT_URL = import.meta.env.VITE_PAYMENT_URL || 'http://localhost:5175';
+export const PAYMENT_URL = import.meta.env.VITE_PAYMENT_URL || 'http://localhost:5176';

@@ -31,7 +31,7 @@ mkdir -p frontend/merchant-desktop
 cat > frontend/merchant-desktop/.env << EOF
 VITE_API_URL=http://$IP:3000/api
 VITE_SOCKET_URL=http://$IP:3000
-VITE_PAYMENT_URL=http://$IP:5175
+VITE_PAYMENT_URL=http://$IP:5176
 EOF
 
 mkdir -p frontend/user-payment
@@ -47,7 +47,7 @@ if [ -f backend/.env ]; then
     # 如果文件存在，更新相关行
     sed -i.bak "s|MOBILE_URL=.*|MOBILE_URL=http://$IP:5173|" backend/.env
     sed -i.bak "s|DESKTOP_URL=.*|DESKTOP_URL=http://$IP:5174|" backend/.env
-    sed -i.bak "s|PAYMENT_URL=.*|PAYMENT_URL=http://$IP:5175|" backend/.env
+    sed -i.bak "s|PAYMENT_URL=.*|PAYMENT_URL=http://$IP:5176|" backend/.env
     rm backend/.env.bak
 else
     # 如果文件不存在，创建新文件
@@ -59,7 +59,7 @@ MONAD_RPC_URL=https://testnet-rpc.monad.xyz
 CONTRACT_ADDRESS=
 MOBILE_URL=http://$IP:5173
 DESKTOP_URL=http://$IP:5174
-PAYMENT_URL=http://$IP:5175
+PAYMENT_URL=http://$IP:5176
 EOF
 fi
 
@@ -68,7 +68,7 @@ echo "✅ 配置文件已生成！"
 echo ""
 echo "📱 手机访问地址："
 echo "   商家手机端: http://$IP:5173"
-echo "   用户支付端: http://$IP:5175"
+echo "   用户支付端: http://$IP:5176"
 echo ""
 echo "💻 电脑访问地址："
 echo "   商家电脑端: http://$IP:5174"

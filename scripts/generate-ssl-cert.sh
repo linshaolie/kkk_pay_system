@@ -96,4 +96,4 @@ echo "  3. 如需浏览器信任的证书，请使用 mkcert（运行 ./scripts/
 echo ""
 print_info "现在可以启动服务并使用 HTTPS 访问："
 echo "  后端:   https://$LOCAL_IP:3000"
-echo "  前端:   https://$LOCAL_IP:5173/5174/5175"
+echo "  前端:   https://$LOCAL_IP:5173/5174/5176"
