@@ -161,7 +161,7 @@ export default function Payment() {
     setPaying(true);
 
     try {
-      // 获取 provider 和 signer
+      // 获取 provider
       const provider = await connector.getProvider();
       
       // 创建 ethers provider，禁用 ENS（Monad 不支持 ENS）
@@ -171,9 +171,6 @@ export default function Payment() {
         chainId: MONAD_CHAIN.id
       });
       
-      // 获取 signer（直接从地址创建，避免 ENS 查询）
-      const signer = await ethersProvider.getSigner();
-
       // 检查网络
       const network = await ethersProvider.getNetwork();
       const currentChainId = Number(network.chainId);
@@ -188,14 +185,22 @@ export default function Payment() {
         return;
       }
 
+      // 获取 signer，使用索引而不是地址（避免 ENS 查询）
+      const signer = await ethersProvider.getSigner(0);
+
       // 支付合约
       const paymentContract = new ethers.Contract(CONTRACT_ADDRESS, PAYMENT_CONTRACT_ABI, signer);
 
       // 支付金额（MON，18位小数）
       const amount = ethers.parseEther(order.amount.toString());
 
-      // 检查 MON 余额
-      const balance = await ethersProvider.getBalance(address);
+      // 检查 MON 余额（使用 signer.address 而不是外部 address，避免 ENS）
+      const signerAddress = await signer.getAddress();
+      const balance = await ethersProvider.getBalance(signerAddress);
+      
+      console.log('钱包地址:', signerAddress);
+      console.log('MON 余额:', ethers.formatEther(balance));
+      
       if (balance < amount) {
         toast.error('MON 余额不足');
         setPaying(false);
