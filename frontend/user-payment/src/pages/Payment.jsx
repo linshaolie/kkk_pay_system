@@ -220,10 +220,8 @@ export default function Payment() {
         return;
       }
 
-      // 将 orderId（UUID 字符串）转换为 uint256
-      // 方法：移除连字符，转换为十六进制数字
-      const orderIdHex = '0x' + orderId.replace(/-/g, '');
-      const orderIdUint256 = BigInt(orderIdHex);
+      // 订单ID（数字字符串）直接转换为 BigInt
+      const orderIdUint256 = BigInt(orderId);
 
       // 零地址（表示原生代币 MON）- 硬编码避免 ENS 查询
       const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';

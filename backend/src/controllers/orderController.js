@@ -1,7 +1,13 @@
-import { v4 as uuidv4 } from 'uuid';
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
 import config from '../config/index.js';
+
+// 生成数字订单号（时间戳 + 随机数）
+const generateNumericOrderId = () => {
+  const timestamp = Date.now(); // 13位时间戳
+  const random = Math.floor(Math.random() * 100000); // 5位随机数
+  return `${timestamp}${random}`; // 18位数字
+};
 
 // 创建订单
 export const createOrder = async (req, res, io) => {
@@ -19,8 +25,8 @@ export const createOrder = async (req, res, io) => {
       });
     }
 
-    // 生成订单ID
-    const orderId = uuidv4();
+    // 生成数字订单ID
+    const orderId = generateNumericOrderId();
 
     // 创建订单
     await Order.create({

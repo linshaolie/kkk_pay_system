@@ -188,7 +188,7 @@
     "product_id": "K001",
     "product_name": "可口可乐",
     "amount": 0.01,
-    "status": "pending",
+    "status": "completed",
     "tx_hash": null,
     "user_wallet": null,
     "paid_at": null,
