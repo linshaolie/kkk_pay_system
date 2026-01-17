@@ -187,15 +187,28 @@ export default function Payment() {
 
       // 获取 signer，使用索引而不是地址（避免 ENS 查询）
       const signer = await ethersProvider.getSigner(0);
+      
+      // 获取钱包地址
+      const signerAddress = await signer.getAddress();
+      
+      // 验证合约地址格式（确保是有效的地址）
+      if (!CONTRACT_ADDRESS || !ethers.isAddress(CONTRACT_ADDRESS)) {
+        toast.error('合约地址配置错误');
+        setPaying(false);
+        return;
+      }
 
-      // 支付合约
-      const paymentContract = new ethers.Contract(CONTRACT_ADDRESS, PAYMENT_CONTRACT_ABI, signer);
+      // 先用 provider 创建合约实例（不会触发 ENS），然后连接 signer
+      const paymentContract = new ethers.Contract(
+        CONTRACT_ADDRESS, 
+        PAYMENT_CONTRACT_ABI, 
+        ethersProvider
+      ).connect(signer);
 
       // 支付金额（MON，18位小数）
       const amount = ethers.parseEther(order.amount.toString());
 
-      // 检查 MON 余额（使用 signer.address 而不是外部 address，避免 ENS）
-      const signerAddress = await signer.getAddress();
+      // 检查 MON 余额
       const balance = await ethersProvider.getBalance(signerAddress);
       
       console.log('钱包地址:', signerAddress);
