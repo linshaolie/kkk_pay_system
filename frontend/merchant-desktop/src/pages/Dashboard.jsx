@@ -21,7 +21,9 @@ export default function Dashboard() {
 
   // 轮询订单状态
   useEffect(() => {
+    // 只有 pending 状态才需要轮询
     if (!currentOrder || currentOrder.order.status !== 'pending') {
+      setIsPolling(false);
       return;
     }
 
@@ -41,7 +43,7 @@ export default function Dashboard() {
       setIsPolling(false);
       console.log('停止轮询订单状态');
     };
-  }, [currentOrder?.order.order_id]);
+  }, [currentOrder?.order.order_id, currentOrder?.order.status]); // 添加 status 到依赖
 
   const checkOrderStatus = async (orderId) => {
     try {
