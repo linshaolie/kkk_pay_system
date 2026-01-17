@@ -163,16 +163,27 @@ export default function Payment() {
     try {
       // 获取 provider 和 signer
       const provider = await connector.getProvider();
-      const ethersProvider = new ethers.BrowserProvider(provider);
+      
+      // 创建 ethers provider，禁用 ENS（Monad 不支持 ENS）
+      const ethersProvider = new ethers.BrowserProvider(provider, {
+        ensAddress: null, // 禁用 ENS
+        name: 'monad',
+        chainId: MONAD_CHAIN.id
+      });
+      
+      // 获取 signer（直接从地址创建，避免 ENS 查询）
       const signer = await ethersProvider.getSigner();
 
       // 检查网络
       const network = await ethersProvider.getNetwork();
-      if (Number(network.chainId) !== MONAD_CHAIN.id) {
-        toast.error('请切换到 Monad 网络');
-        if (switchChain) {
-          switchChain({ chainId: MONAD_CHAIN.id });
-        }
+      const currentChainId = Number(network.chainId);
+      
+      console.log('当前网络 Chain ID:', currentChainId);
+      console.log('目标 Monad Chain ID:', MONAD_CHAIN.id);
+      
+      // 如果网络不匹配，提示用户
+      if (currentChainId !== MONAD_CHAIN.id) {
+        toast.error(`请切换到 Monad 网络 (Chain ID: ${MONAD_CHAIN.id})`, { id: 'pay' });
         setPaying(false);
         return;
       }

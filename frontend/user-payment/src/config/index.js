@@ -8,9 +8,9 @@ import { defineChain } from 'viem';
 
 // Monad 链配置
 export const MONAD_CHAIN = defineChain({
-  id: 41454, // Monad Testnet Chain ID（请根据实际网络调整）
-  name: 'Monad Testnet',
-  network: 'monad-testnet',
+  id: 10143, // Monad Devnet Chain ID (根据实际网络确认)
+  name: 'Monad Devnet',
+  network: 'monad-devnet',
   nativeCurrency: {
     decimals: 18,
     name: 'Monad',
@@ -25,7 +25,7 @@ export const MONAD_CHAIN = defineChain({
   //   }
   // } : {}),
   blockExplorers: {
-    default: { name: 'MonadScan', url: 'https://testnet.monad.xyz' },
+    default: { name: 'MonadScan', url: 'https://explorer.monad.xyz' },
   },
   testnet: true,
 });
