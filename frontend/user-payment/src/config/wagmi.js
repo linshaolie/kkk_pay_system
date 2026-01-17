@@ -1,4 +1,5 @@
-import { createConfig, http } from 'wagmi';
+import { createConfig } from 'wagmi';
+import { http } from 'viem'; // http 从 viem 导入，不是 wagmi
 import { injected, metaMask } from 'wagmi/connectors';
 import { MONAD_CHAIN } from './index';
 
