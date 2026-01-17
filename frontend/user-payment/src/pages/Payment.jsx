@@ -212,13 +212,21 @@ export default function Payment() {
       const orderIdHex = '0x' + orderId.replace(/-/g, '');
       const orderIdUint256 = BigInt(orderIdHex);
 
+      // 零地址（表示原生代币 MON）- 硬编码避免 ENS 查询
+      const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+
+      console.log('准备支付:');
+      console.log('  订单ID:', orderIdUint256.toString());
+      console.log('  代币地址:', ZERO_ADDRESS);
+      console.log('  支付金额:', ethers.formatEther(amount), 'MON');
+
       toast.loading('正在支付...', { id: 'pay' });
 
       // 调用支付函数：pay(uint256 orderId, address token, uint256 amount)
-      // token 使用 address(0) 表示 ETH/MON
+      // token 使用 0x0000... 表示原生代币（MON）
       const payTx = await paymentContract.pay(
         orderIdUint256,
-        ethers.ZeroAddress, // address(0) 表示使用原生代币（MON）
+        ZERO_ADDRESS, // 硬编码的零地址，避免 ENS
         amount,
         {
           value: amount, // 发送 MON 作为交易的 value
