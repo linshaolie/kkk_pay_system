@@ -160,6 +160,8 @@ export default function Dashboard() {
     }
   };
 
+  console.log('currentOrder.paymentUrl: ', currentOrder.paymentUrl);
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -269,12 +271,12 @@ export default function Dashboard() {
                 <div className="flex flex-col items-center mb-6">
                   <div className="bg-white p-6 rounded-2xl shadow-lg">
                     <QRCodeSVG
-                      value={currentOrder.paymentUrl.replace('5175', '5176')}
+                      value={currentOrder.paymentUrl.replace('https://192.168.0.92:5175', 'http://169.254.72.58:5176')}
                       size={280}
                       level="H"
                       includeMargin={true}
                     />
-                    <a href={currentOrder.paymentUrl.replace('5175', '5176')} target="_blank" rel="noopener noreferrer">
+                    <a href={currentOrder.paymentUrl.replace('https://192.168.0.92:5175', 'http://169.254.72.58:5176')} target="_blank" rel="noopener noreferrer">
                       goto Pay
                     </a>
                   </div>
