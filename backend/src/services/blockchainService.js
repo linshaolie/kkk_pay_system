@@ -1,12 +1,17 @@
 import { ethers } from 'ethers';
+import { readFileSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import config from '../config/index.js';
 import Order from '../models/Order.js';
 
-// 合约 ABI
-const CONTRACT_ABI = [
-  'event PaymentCompleted(bytes32 indexed orderId, address indexed user, address indexed merchant, uint256 amount, uint256 timestamp)',
-  'function pay(bytes32 orderId) external payable',
-];
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// 读取合约 ABI
+const CONTRACT_ABI = JSON.parse(
+  readFileSync(join(__dirname, '../../../contracts/PaymentContract.abi.json'), 'utf8')
+);
 
 class BlockchainService {
   constructor(io) {
@@ -72,27 +77,27 @@ class BlockchainService {
         }
       }
 
-      // 设置事件监听器
-      this.contract.on('PaymentCompleted', async (orderId, user, merchant, amount, timestamp, event) => {
+      // 设置事件监听器 - 监听 PaymentMade 事件
+      this.contract.on('PaymentMade', async (orderId, payer, token, amount, timestamp, event) => {
         try {
           console.log('收到支付完成事件:', {
-            orderId: orderId,
-            user,
-            merchant,
-            amount: ethers.formatEther(amount) + ' MON',
+            orderId: orderId.toString(),
+            payer,
+            token,
+            amount: ethers.formatEther(amount) + ' ' + (token === ethers.ZeroAddress ? 'ETH' : 'tokens'),
             timestamp: timestamp.toString(),
             txHash: event.log.transactionHash,
           });
 
-          // 将 bytes32 转换为 UUID 字符串
-          const orderIdStr = this.bytes32ToUUID(orderId);
+          // orderId 是 uint256，直接转换为字符串作为 UUID
+          const orderIdStr = orderId.toString();
           
           // 更新订单状态
           await Order.updateStatus(
             orderIdStr,
             'completed',
             event.log.transactionHash,
-            user
+            payer
           );
 
           // 获取订单详情
@@ -104,7 +109,7 @@ class BlockchainService {
               orderId: orderIdStr,
               amount: order.amount,
               txHash: event.log.transactionHash,
-              userWallet: user,
+              userWallet: payer,
             });
 
             console.log(`订单 ${orderIdStr} 支付成功，已通知商家`);
@@ -127,28 +132,25 @@ class BlockchainService {
   // 停止监听
   stopListening() {
     if (this.contract && this.isListening) {
-      this.contract.removeAllListeners('PaymentCompleted');
+      this.contract.removeAllListeners('PaymentMade');
       this.isListening = false;
       console.log('合约事件监听已停止');
     }
   }
 
-  // UUID 转 bytes32
-  uuidToBytes32(uuid) {
+  // UUID 转 uint256 (将 UUID 转换为数字)
+  uuidToUint256(uuid) {
+    // 移除连字符，得到32个十六进制字符
     const hex = uuid.replace(/-/g, '');
-    return '0x' + hex;
+    // 转换为 BigInt
+    return BigInt('0x' + hex);
   }
 
-  // bytes32 转 UUID
-  bytes32ToUUID(bytes32) {
-    const hex = bytes32.slice(2);
-    return [
-      hex.slice(0, 8),
-      hex.slice(8, 12),
-      hex.slice(12, 16),
-      hex.slice(16, 20),
-      hex.slice(20, 32),
-    ].join('-');
+  // uint256 转 UUID (如果需要的话，但实际上订单ID就是 uint256 字符串)
+  uint256ToUUID(uint256Str) {
+    // 如果订单ID本来就是数字字符串，直接返回
+    // 如果需要转回 UUID 格式，可以补零并格式化
+    return uint256Str.toString();
   }
 
   // 获取交易详情

@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 import api from '../utils/api';
 import { API_ENDPOINTS } from '../config';
 import { CONTRACT_ADDRESS, MONAD_CHAIN } from '../config';
-import { CONTRACT_ABI } from '../contracts/abi';
+import { PAYMENT_CONTRACT_ABI } from '../contracts/abi';
 import toast from 'react-hot-toast';
 import { Wallet, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 
@@ -92,7 +92,7 @@ export default function Payment() {
       }
 
       // 支付合约
-      const paymentContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+      const paymentContract = new ethers.Contract(CONTRACT_ADDRESS, PAYMENT_CONTRACT_ABI, signer);
 
       // 支付金额（MON，18位小数）
       const amount = ethers.parseEther(order.amount.toString());
@@ -105,15 +105,23 @@ export default function Payment() {
         return;
       }
 
-      // 转换 orderId 为 bytes32
-      const orderIdBytes32 = ethers.encodeBytes32String(orderId.replace(/-/g, '').slice(0, 32));
+      // 将 orderId（UUID 字符串）转换为 uint256
+      // 方法：移除连字符，转换为十六进制数字
+      const orderIdHex = '0x' + orderId.replace(/-/g, '');
+      const orderIdUint256 = BigInt(orderIdHex);
 
       toast.loading('正在支付...', { id: 'pay' });
 
-      // 调用支付函数，发送 MON
-      const payTx = await paymentContract.pay(orderIdBytes32, {
-        value: amount, // 发送 MON 作为交易的 value
-      });
+      // 调用支付函数：pay(uint256 orderId, address token, uint256 amount)
+      // token 使用 address(0) 表示 ETH/MON
+      const payTx = await paymentContract.pay(
+        orderIdUint256,
+        ethers.ZeroAddress, // address(0) 表示使用原生代币（MON）
+        amount,
+        {
+          value: amount, // 发送 MON 作为交易的 value
+        }
+      );
       
       toast.loading('等待交易确认...', { id: 'pay' });
       
