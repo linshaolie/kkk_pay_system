@@ -205,10 +205,18 @@ npm run dev
 
 ## 📚 文档
 
+### 快速上手
 - **[快速开始](./QUICK_START.md)** - 最简单的启动指南
 - **[钱包配置](./docs/WALLET_CONFIG.md)** - Web3 钱包支付配置
+- **[移动访问](./docs/MOBILE_ACCESS.md)** - 手机访问本地服务
+
+### 部署文档
+- **[Zeabur 部署](./docs/ZEABUR_DEPLOY.md)** - ⭐️ 推荐：前后端一站式部署
+- **[Vercel 部署](./docs/VERCEL_DEPLOY_QUICK.md)** - 仅前端部署
+- **[通用部署](./docs/DEPLOYMENT.md)** - 其他平台参考
+
+### 开发文档
 - **[API 文档](./docs/API.md)** - 完整的 API 参考
-- **[部署指南](./docs/DEPLOYMENT.md)** - 详细的部署步骤
 
 ## 🎯 快速测试
 
