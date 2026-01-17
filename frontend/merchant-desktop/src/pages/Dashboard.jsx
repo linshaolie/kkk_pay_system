@@ -275,11 +275,7 @@ export default function Dashboard() {
                       includeMargin={true}
                     />
                     <a href={currentOrder.paymentUrl} target="_blank" rel="noopener noreferrer">
-                      <Button>
-                        <Link href={currentOrder.paymentUrl}>
-                          <span>Open in new tab</span>
-                        </Link>
-                      </Button>
+                      goto Pay
                     </a>
                   </div>
                   <p className="text-gray-600 text-sm mt-4">

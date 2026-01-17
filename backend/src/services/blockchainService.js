@@ -84,13 +84,23 @@ class BlockchainService {
             orderId: orderId.toString(),
             payer,
             token,
-            amount: ethers.formatEther(amount) + ' ' + (token === ethers.ZeroAddress ? 'ETH' : 'tokens'),
+            amount: ethers.formatEther(amount) + ' ' + (token === ethers.ZeroAddress ? 'MON' : 'tokens'),
             timestamp: timestamp.toString(),
             txHash: event.log.transactionHash,
           });
 
-          // orderId 是 uint256，直接转换为字符串作为 UUID
-          const orderIdStr = orderId.toString();
+          // 将 uint256 转换回 UUID 格式
+          // uint256 -> hex string -> UUID
+          let orderIdHex = orderId.toString(16).padStart(32, '0'); // 转为32位十六进制
+          const orderIdStr = [
+            orderIdHex.slice(0, 8),
+            orderIdHex.slice(8, 12),
+            orderIdHex.slice(12, 16),
+            orderIdHex.slice(16, 20),
+            orderIdHex.slice(20, 32)
+          ].join('-');
+          
+          console.log('转换后的订单ID:', orderIdStr);
           
           // 更新订单状态
           await Order.updateStatus(
@@ -113,6 +123,8 @@ class BlockchainService {
             });
 
             console.log(`订单 ${orderIdStr} 支付成功，已通知商家`);
+          } else {
+            console.warn(`订单 ${orderIdStr} 不存在，可能已被删除`);
           }
         } catch (error) {
           console.error('处理支付完成事件失败:', error);
