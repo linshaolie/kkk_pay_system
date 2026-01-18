@@ -217,7 +217,7 @@ export default function Dashboard() {
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* 左侧：统计数据 */}
-          {/* <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-1 space-y-6">
             <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg p-6 text-white">
               <h2 className="text-lg font-semibold mb-4">今日销售统计</h2>
               <div className="space-y-4">
@@ -252,10 +252,10 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
-          </div> */}
+          </div>
 
           {/* 右侧：订单显示区 */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-2">
             {currentOrder ? (
               <>
                 {/* 待支付状态 */}
@@ -305,12 +305,12 @@ export default function Dashboard() {
                     <div className="flex flex-col items-center mb-6">
                       <div className="bg-white p-6 rounded-2xl shadow-lg">
                         <QRCodeSVG
-                          value={currentOrder.paymentUrl.replace('https://192.168.0.92:5175', 'http://169.254.72.58:5176')}
+                          value={currentOrder.paymentUrl}
                           size={280}
                           level="H"
                           includeMargin={true}
                         />
-                        <a href={currentOrder.paymentUrl.replace('https://192.168.0.92:5175', 'http://169.254.72.58:5176')} target="_blank" rel="noopener noreferrer">
+                        <a href={currentOrder.paymentUrl} target="_blank" rel="noopener noreferrer">
                           goto Pay
                         </a>
                       </div>

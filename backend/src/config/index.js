@@ -21,6 +21,6 @@ export default {
   frontend: {
     mobileUrl: process.env.MOBILE_URL || 'http://localhost:5173',
     desktopUrl: process.env.DESKTOP_URL || 'http://localhost:5174',
-    paymentUrl: process.env.PAYMENT_URL || 'http://localhost:5176',
+    paymentUrl: process.env.PAYMENT_URL || 'http://localhost:5175',
   },
 };

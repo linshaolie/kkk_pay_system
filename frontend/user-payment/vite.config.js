@@ -12,12 +12,12 @@ const hasHttps = fs.existsSync(certPath) && fs.existsSync(keyPath)
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: '0.0.0.0',
-    port: 5176,
+    host: 'localhost',
+    port: 5175,
     // 临时禁用 HTTPS 以便测试
-    // https: hasHttps ? {
-    //   key: fs.readFileSync(keyPath),
-    //   cert: fs.readFileSync(certPath),
-    // } : undefined,
+    https: hasHttps ? {
+      key: fs.readFileSync(keyPath),
+      cert: fs.readFileSync(certPath),
+    } : undefined,
   },
 })

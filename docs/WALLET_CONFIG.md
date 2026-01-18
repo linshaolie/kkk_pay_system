@@ -74,7 +74,7 @@ npm run dev
 
 ### 测试 1：访问首页
 
-访问 http://localhost:5176
+访问 http://localhost:5175
 
 **期望结果：**
 - ✅ 看到 "Web3 钱包支付已启用" 提示（绿色）
@@ -82,7 +82,7 @@ npm run dev
 
 ### 测试 2：访问支付页面
 
-访问任意订单支付页面：http://localhost:5176/pay/xxx
+访问任意订单支付页面：http://localhost:5175/pay/xxx
 
 **期望结果：**
 - ✅ 显示 "连接钱包" 按钮

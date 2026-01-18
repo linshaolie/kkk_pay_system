@@ -45,31 +45,31 @@ export const createOrder = async (req, res, io, blockchainService) => {
     const paymentUrl = `${config.frontend.paymentUrl}/pay/${orderId}`;
 
     // 🎬 DEMO 模式：5秒后自动完成订单
-    setTimeout(async () => {
-      try {
-        console.log(`🎬 [DEMO] 订单 ${orderId} 5秒后自动完成...`);
+    // setTimeout(async () => {
+    //   try {
+    //     console.log(`🎬 [DEMO] 订单 ${orderId} 5秒后自动完成...`);
         
-        // 更新订单状态为已完成
-        await Order.updateStatus(orderId, 'completed', null, 'demo_user');
+    //     // 更新订单状态为已完成
+    //     await Order.updateStatus(orderId, 'completed', null, 'demo_user');
         
-        // 获取更新后的订单
-        const completedOrder = await Order.findByOrderId(orderId);
+    //     // 获取更新后的订单
+    //     const completedOrder = await Order.findByOrderId(orderId);
         
-        if (completedOrder && io) {
-          // 通知商家电脑端
-          io.to(`merchant_${merchantId}`).emit('payment_completed', {
-            orderId,
-            amount: completedOrder.amount,
-            txHash: null,
-            userWallet: 'demo_user',
-          });
+    //     if (completedOrder && io) {
+    //       // 通知商家电脑端
+    //       io.to(`merchant_${merchantId}`).emit('payment_completed', {
+    //         orderId,
+    //         amount: completedOrder.amount,
+    //         txHash: null,
+    //         userWallet: 'demo_user',
+    //       });
           
-          console.log(`✅ [DEMO] 订单 ${orderId} 已自动完成，已通知商家`);
-        }
-      } catch (error) {
-        console.error(`❌ [DEMO] 订单 ${orderId} 自动完成失败:`, error);
-      }
-    }, 15000); // 5秒
+    //       console.log(`✅ [DEMO] 订单 ${orderId} 已自动完成，已通知商家`);
+    //     }
+    //   } catch (error) {
+    //     console.error(`❌ [DEMO] 订单 ${orderId} 自动完成失败:`, error);
+    //   }
+    // }, 15000); // 5秒
 
     // 开始轮询订单支付状态（作为事件监听的备份方案）
     // 注意：DEMO 模式下也保留轮询，以便测试轮询功能

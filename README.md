@@ -101,7 +101,7 @@ MONAD_RPC_URL=https://testnet-rpc.monad.xyz
 # 前端地址
 MOBILE_URL=http://localhost:5173
 DESKTOP_URL=http://localhost:5174
-PAYMENT_URL=http://localhost:5176
+PAYMENT_URL=http://localhost:5175
 ```
 
 #### 用户支付端配置（如需钱包支付）
@@ -155,7 +155,7 @@ npm run dev
 
 - 商家手机端：http://localhost:5173
 - 商家电脑端：http://localhost:5174
-- 用户支付端：http://localhost:5176
+- 用户支付端：http://localhost:5175
 - 后端 API：http://localhost:3000
 
 ## 🔄 业务流程

@@ -60,7 +60,7 @@ VITE_SOCKET_URL=http://192.168.1.100:3000
 ```env
 VITE_API_URL=http://192.168.1.100:3000/api
 VITE_SOCKET_URL=http://192.168.1.100:3000
-VITE_PAYMENT_URL=http://192.168.1.100:5176
+VITE_PAYMENT_URL=http://192.168.1.100:5175
 ```
 
 **用户支付端** (`frontend/user-payment/.env`):
@@ -84,7 +84,7 @@ CONTRACT_ADDRESS=
 
 MOBILE_URL=http://192.168.1.100:5173
 DESKTOP_URL=http://192.168.1.100:5174
-PAYMENT_URL=http://192.168.1.100:5176
+PAYMENT_URL=http://192.168.1.100:5175
 ```
 
 #### 4. 修改 Vite 配置
@@ -119,7 +119,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: '0.0.0.0',  // 添加这行
-    port: 5176,
+    port: 5175,
   },
 })
 ```
@@ -151,7 +151,7 @@ npm run dev -- --host 0.0.0.0
 配置完成后，在手机浏览器中访问：
 
 - **商家手机端**: `http://192.168.1.100:5173`
-- **用户支付端**: `http://192.168.1.100:5176`
+- **用户支付端**: `http://192.168.1.100:5175`
 
 ## 🛡️ 防火墙配置
 
@@ -180,7 +180,7 @@ sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add /usr/local/bin/node
 2. 点击 "高级设置"
 3. 点击 "入站规则" > "新建规则"
 4. 选择 "端口"
-5. 添加端口：3000, 5173, 5174, 5176
+5. 添加端口：3000, 5173, 5174, 5175
 6. 允许连接
 
 ### Linux
@@ -190,13 +190,13 @@ sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add /usr/local/bin/node
 sudo ufw allow 3000
 sudo ufw allow 5173
 sudo ufw allow 5174
-sudo ufw allow 5176
+sudo ufw allow 5175
 
 # iptables
 sudo iptables -A INPUT -p tcp --dport 3000 -j ACCEPT
 sudo iptables -A INPUT -p tcp --dport 5173 -j ACCEPT
 sudo iptables -A INPUT -p tcp --dport 5174 -j ACCEPT
-sudo iptables -A INPUT -p tcp --dport 5176 -j ACCEPT
+sudo iptables -A INPUT -p tcp --dport 5175 -j ACCEPT
 ```
 
 ## 🐛 故障排除
@@ -268,7 +268,7 @@ ngrok http 3000
 # 启动前端隧道（需要多个终端）
 ngrok http 5173
 ngrok http 5174
-ngrok http 5176
+ngrok http 5175
 ```
 
 然后使用 ngrok 提供的公网 URL 更新配置。
